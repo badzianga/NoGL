@@ -15,17 +15,14 @@ typedef struct {
     uint32_t width;
     uint32_t height;
     uint32_t* pixels;
-} Canvas;
+} Surface;
 
-Canvas canvas_create(uint32_t width, uint32_t height);
-void canvas_destroy(Canvas canvas);
-void canvas_save_to_ppm(Canvas canvas, const char* file_path);
-void canvas_fill_iter(Canvas canvas, uint32_t color);
-void canvas_fill_ptr(Canvas canvas, uint32_t color);
-void canvas_fill_avx2(Canvas canvas, uint32_t color);
-void canvas_fill_sse(Canvas canvas, uint32_t color);
-void draw_rect(Canvas canvas, int x, int y, int w, int h, uint32_t color);
-void draw_circle(Canvas canvas, int x, int y, int r, uint32_t color);
-void draw_line(Canvas canvas, int x0, int y0, int x1, int y1, uint32_t color);
+Surface surface_create(uint32_t width, uint32_t height);
+void surface_destroy(Surface surface);
+void surface_save_to_ppm(Surface surface, const char* file_path);
+void surface_fill(Surface surface, uint32_t color);
+void draw_rect(Surface surface, int x, int y, int w, int h, uint32_t color);
+void draw_circle(Surface surface, int x, int y, int r, uint32_t color);
+void draw_line(Surface surface, int x0, int y0, int x1, int y1, uint32_t color);
 
 #endif //NOGL_H
