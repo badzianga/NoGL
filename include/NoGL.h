@@ -24,5 +24,6 @@ void canvas_fill_iter(Canvas canvas, uint32_t color);
 void canvas_fill_ptr(Canvas canvas, uint32_t color);
 void canvas_fill_avx2(Canvas canvas, uint32_t color);
 void canvas_fill_sse(Canvas canvas, uint32_t color);
+void rect_fill(Canvas canvas, int x, int y, int w, int h, uint32_t color);
 
 #endif //NOGL_H

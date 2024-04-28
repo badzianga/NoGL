@@ -67,18 +67,6 @@ void canvas_fill_ptr(Canvas canvas, uint32_t color) {
     }
 }
 
-//void canvas_fill_avx2(Canvas canvas, uint32_t color) {
-//    __m256i color_simd = _mm256_set1_epi32(*(int*)&color);
-//    uint32_t block_count = canvas.width * canvas.height / 8;
-//    __m256i* blocks = (__m256i*)canvas.pixels;
-//    for (uint32_t i = 0; i < block_count; ++i) {
-//        blocks[i] = color_simd;
-//    }
-//    for (uint32_t i = block_count * 8; i < canvas.width * canvas.height; ++i) {
-//        canvas.pixels[i] = color;
-//    }
-//}
-
 void canvas_fill_avx2(Canvas canvas, uint32_t color) {
     __m256i color_simd = _mm256_set1_epi32(*(int*)&color);
     uint32_t block_count = canvas.width * canvas.height / 8;
@@ -100,5 +88,17 @@ void canvas_fill_sse(Canvas canvas, uint32_t color) {
     }
     for (uint32_t i = block_count * 4; i < canvas.width * canvas.height; ++i) {
         canvas.pixels[i] = color;
+    }
+}
+
+void rect_fill(Canvas canvas, int x, int y, int w, int h, uint32_t color) {
+    for (int dy = 0; dy < h; ++dy) {
+        int yi = y + dy;
+        if (yi < 0 || yi >= canvas.height) continue;
+        for (int dx = 0; dx < w; ++dx) {
+            int xi = x + dx;
+            if (xi < 0 || xi >= canvas.width) continue;
+            canvas.pixels[yi * canvas.width + xi] = color;
+        }
     }
 }
