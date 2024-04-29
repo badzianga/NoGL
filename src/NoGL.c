@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 Surface surface_create(uint32_t width, uint32_t height) {
     Surface surface = {
@@ -129,13 +131,22 @@ Surface surface_copy(Surface original) {
 }
 
 void surface_blit(Surface destination, Surface source, int x, int y) {
-    int x1 = x + (int)source.width;
-    int y1 = y + (int)source.height;
-    for (int yi = y; yi < y1; ++yi) {
-        if (yi < 0 || yi >= destination.height) continue;
-        for (int xi = x; xi < x1; ++xi) {
-            if (xi < 0 || xi >= destination.width) continue;
-            destination.pixels[yi * destination.width + xi] = source.pixels[yi * source.width + xi];
+    for (int yi = 0; yi < source.height; ++yi) {
+        if (yi + y < 0 || yi + y >= destination.height) continue;
+        for (int xi = 0; xi < source.width; ++xi) {
+            if (xi + x < 0 || xi + x >= destination.width) continue;
+            destination.pixels[(y + yi) * destination.width + (x + xi)] = source.pixels[yi * source.width + xi];
         }
     }
+}
+
+Surface image_load(const char* filename) {
+    int width, height, nrChannels;
+    uint8_t* data = stbi_load(filename, &width, &height, &nrChannels, 0);
+
+    Surface image = surface_create(width, height);
+    memcpy(image.pixels, data, width * height * nrChannels);
+
+    stbi_image_free(data);
+    return image;
 }
