@@ -17,7 +17,7 @@ void surface_destroy(Surface surface) {
     free(surface.pixels);
 }
 
-void surface_save_to_ppm(Surface surface, const char* file_path) {
+void image_save_ppm(Surface surface, const char* file_path) {
     FILE* f = fopen(file_path, "wb");
     if (f == NULL) {
         fprintf(stderr, "[ERROR] Failed to open file: %s\n", file_path);
@@ -118,6 +118,24 @@ void draw_line(Surface surface, int x0, int y0, int x1, int y1, uint32_t color) 
         for (int y = y0; y < y1; ++y) {
             if (y < 0 || y >= surface.height) continue;
             surface.pixels[y * surface.width + x] = color;
+        }
+    }
+}
+
+Surface surface_copy(Surface original) {
+    Surface copy = surface_create(original.width, original.height);
+    memcpy(copy.pixels, original.pixels, copy.width * copy.height);
+    return copy;
+}
+
+void surface_blit(Surface destination, Surface source, int x, int y) {
+    int x1 = x + (int)source.width;
+    int y1 = y + (int)source.height;
+    for (int yi = y; yi < y1; ++yi) {
+        if (yi < 0 || yi >= destination.height) continue;
+        for (int xi = x; xi < x1; ++xi) {
+            if (xi < 0 || xi >= destination.width) continue;
+            destination.pixels[yi * destination.width + xi] = source.pixels[yi * source.width + xi];
         }
     }
 }
