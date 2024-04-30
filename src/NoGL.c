@@ -142,10 +142,10 @@ void surface_blit(Surface destination, Surface source, int x, int y) {
 
 Surface image_load(const char* filename) {
     int width, height, nrChannels;
-    uint8_t* data = stbi_load(filename, &width, &height, &nrChannels, 0);
+    uint8_t* data = stbi_load(filename, &width, &height, &nrChannels, 4);
 
     Surface image = surface_create(width, height);
-    memcpy(image.pixels, data, width * height * nrChannels);
+    memcpy(image.pixels, data, width * height * sizeof(uint32_t));
 
     stbi_image_free(data);
     return image;
