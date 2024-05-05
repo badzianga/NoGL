@@ -44,19 +44,22 @@ void draw_aaline(Surface surface, int x0, int y0, int x1, int y1, Color color); 
 void draw_aaellipse(Surface surface, ...);  // TODO: not implemented
 void draw_aatriangle(Surface surface, int x0, int y0, int x1, int y1, Color color);  // TODO: not implemented
 
-// Image module
+// Image module ----------------------------------------------------------------------------------------------------- //
 Surface image_load(const char* filename);  // TODO: remove or re-implement
 void image_save_ppm(Surface surface, const char* file_path);
 void image_save_jpg(Surface surface, const char* file_path);  // TODO: not implemented
 void image_save_png(Surface surface, const char* file_path);  // TODO: not implemented
 void image_save_bmp(Surface surface, const char* file_path);  // TODO: not implemented
 
-// display module
+// Display module --------------------------------------------------------------------------------------------------- //
 // TODO:
 //  Display_init will create a window and rendering surface.
 //  The surface will be returned, but the copy will exist in display module.
 Surface display_init(int width, int height, const char* title);  // TODO: not implemented
 void display_quit();  // TODO: not implemented
 void display_update();  // TODO: not implemented
+
+// Font module ------------------------------------------------------------------------------------------------------ //
+void draw_text(Surface surface, int x, int y, const char* text, Color color);
 
 #endif //NOGL_H
