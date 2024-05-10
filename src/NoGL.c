@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 
 // Surface module --------------------------------------------------------------------------------------------------- //
@@ -142,17 +140,6 @@ void draw_line(Surface surface, int x0, int y0, int x1, int y1, Color color) {
 
 
 // Image module ----------------------------------------------------------------------------------------------------- //
-Surface image_load(const char* filename) {
-    int width, height, nrChannels;
-    uint8_t* data = stbi_load(filename, &width, &height, &nrChannels, 4);
-
-    Surface image = surface_create(width, height);
-    memcpy(image.pixels, data, width * height * sizeof(uint32_t));
-
-    stbi_image_free(data);
-    return image;
-}
-
 void image_save_ppm(Surface surface, const char* file_path) {
     FILE* f = fopen(file_path, "wb");
     if (f == NULL) {
