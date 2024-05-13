@@ -140,6 +140,58 @@ void draw_line(Surface surface, int x0, int y0, int x1, int y1, Color color) {
 
 
 // Image module ----------------------------------------------------------------------------------------------------- //
+Surface image_load_ppm(const char* file_path) {
+    FILE* f = fopen(file_path, "rb");
+    if (f == NULL) {
+        fprintf(stderr, "[ERROR] Failed to open file: %s\n", file_path);
+        // TODO: created surfaces aren't deleted
+        exit(1);
+    }
+    char buffer[32];
+    if (!fgets(buffer, sizeof(buffer), f)) {
+        perror(file_path);
+        exit(1);
+    }
+    if (buffer[0] != 'P' || buffer[1] != '6') {
+        fprintf(stderr, "[ERROR] Invalid image format (must be 'P6')\n");
+        exit(1);
+    }
+
+    //check for comments
+    int c = getc(f);
+    while (c == '#') {
+        while (getc(f) != '\n') ;
+        c = getc(f);
+    }
+    ungetc(c, f);
+
+    uint32_t w, h;
+    if (fscanf(f, "%d %d", &w, &h) != 2) {
+        fprintf(stderr, "[ERROR] Invalid image size\n");
+        exit(1);
+    }
+    printf("Image size: %dx%d\n", w, h);
+
+    Surface image = surface_create(w, h);
+    while (fgetc(f) != '\n');
+    fgetc(f);
+
+    for (uint32_t i = 0; i < w * h; ++i) {
+        Color pixel;
+        pixel.a = 255;
+        fscanf(f, "%c %c %c", &pixel.b, &pixel.g, &pixel.r);
+        image.pixels[i] = pixel;
+    }
+//    if (fread(image.pixels, 3 * image.width, image.height, f) != image.height) {
+//        fprintf(stderr, "Error loading image \n");
+//        surface_destroy(image);
+//        exit(1);
+//    }
+
+    fclose(f);
+    return image;
+}
+
 void image_save_ppm(Surface surface, const char* file_path) {
     FILE* f = fopen(file_path, "wb");
     if (f == NULL) {

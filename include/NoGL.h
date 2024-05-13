@@ -33,23 +33,13 @@ void surface_blit(Surface destination, Surface source, int x, int y);
 Surface surface_copy(Surface original);
 
 // Drawing module --------------------------------------------------------------------------------------------------- //
-// TODO: implement alpha blending
 void draw_rect(Surface surface, int x, int y, int w, int h, Color color);
 void draw_circle(Surface surface, int x, int y, int r, Color color);
 void draw_line(Surface surface, int x0, int y0, int x1, int y1, Color color);
-void draw_ellipse(Surface surface, ...);  // TODO: not implemented
-void draw_triangle(Surface surface, ...);  // TODO: not implemented
-void draw_aacircle(Surface surface, int x, int y, int r, Color color);  // TODO: not implemented
-void draw_aaline(Surface surface, int x0, int y0, int x1, int y1, Color color);  // TODO: not implemented
-void draw_aaellipse(Surface surface, ...);  // TODO: not implemented
-void draw_aatriangle(Surface surface, int x0, int y0, int x1, int y1, Color color);  // TODO: not implemented
 
 // Image module ----------------------------------------------------------------------------------------------------- //
-Surface image_load(const char* filename);  // TODO: remove or re-implement
+Surface image_load_ppm(const char* file_path);
 void image_save_ppm(Surface surface, const char* file_path);
-void image_save_jpg(Surface surface, const char* file_path);  // TODO: not implemented
-void image_save_png(Surface surface, const char* file_path);  // TODO: not implemented
-void image_save_bmp(Surface surface, const char* file_path);  // TODO: not implemented
 
 // Display module --------------------------------------------------------------------------------------------------- //
 // TODO:
