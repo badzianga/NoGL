@@ -42,12 +42,10 @@ Surface image_load_ppm(const char* file_path);
 void image_save_ppm(Surface surface, const char* file_path);
 
 // Display module --------------------------------------------------------------------------------------------------- //
-// TODO:
-//  Display_init will create a window and rendering surface.
-//  The surface will be returned, but the copy will exist in display module.
-Surface display_init(int width, int height, const char* title);  // TODO: not implemented
-void display_quit();  // TODO: not implemented
-void display_update();  // TODO: not implemented
+Surface display_init(int width, int height, const char* title);
+int display_should_close();
+void display_quit();
+void display_update();
 
 // Font module ------------------------------------------------------------------------------------------------------ //
 void draw_text(Surface surface, int x, int y, const char* text, Color color);

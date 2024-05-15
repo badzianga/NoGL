@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <X11/Xlib.h>
 
 
 // Surface module --------------------------------------------------------------------------------------------------- //
@@ -437,4 +438,64 @@ void draw_text(Surface surface, int x, int y, const char* text, Color color) {
     for (int i = 0; i < len; ++i) {
         draw_char(surface, x + i * (CHAR_WIDTH + 1), y, text[i], color);
     }
+}
+
+// Display module --------------------------------------------------------------------------------------------------- //
+static Surface display_surface = { 0 };
+static Display* display;
+static Window window;
+static XWindowAttributes wa = { 0 };
+static XImage* image;
+static GC gc;
+static Atom wm_delete_window;
+static int should_close = 0;
+
+Surface display_init(int width, int height, const char* title) {
+    (void) title;
+    display_surface = surface_create(width, height);
+    display = XOpenDisplay(NULL);
+    if (display == NULL) {
+        fprintf(stderr, "[ERROR] Failed to connect to X server!\n");
+    }
+    window = XCreateSimpleWindow(display, XDefaultRootWindow(display), 0, 0, width, height, 0, 0, 0);
+    XGetWindowAttributes(display, window, &wa);
+    image = XCreateImage(display, wa.visual, wa.depth, ZPixmap, 0, (char*)display_surface.pixels, display_surface.width, display_surface.height, 32, (int)(display_surface.width * sizeof(uint32_t)));
+    gc = XCreateGC(display, window, 0, NULL);
+    XSelectInput(display, window, KeyPressMask);  // | ExposureMask
+    XMapWindow(display, window);
+    wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(display, window, &wm_delete_window, 1);
+    XSync(display, False);
+
+    return display_surface;
+}
+
+void display_quit() {
+    XFreeGC(display, gc);
+    XDestroyWindow(display, window);
+    XCloseDisplay(display);
+    surface_destroy(display_surface);
+}
+
+int display_should_close() {
+    return should_close;
+}
+
+void display_update() {
+    while (XPending(display) > 0) {
+        XEvent event = { 0 };
+        XNextEvent(display, &event);
+        switch (event.type) {
+            case KeyPress:
+                printf("Key pressed!\n");
+                break;
+            case ClientMessage:
+                if ((Atom)event.xclient.data.l[0] == wm_delete_window) {
+                    should_close = 1;
+                }
+                break;
+        }
+    }
+    XPutImage(display, window, gc, image, 0, 0, 0, 0, display_surface.width, display_surface.height);
+    XSync(display, False);
 }
