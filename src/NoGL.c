@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
-
+#include <immintrin.h>
 
 // Surface module --------------------------------------------------------------------------------------------------- //
 Surface surface_create(uint32_t width, uint32_t height) {
@@ -21,9 +21,29 @@ void surface_destroy(Surface surface) {
 }
 
 void surface_fill(Surface surface, Color color) {
-    const Color* end = &surface.pixels[surface.width * surface.height];
-    for (Color* cur = surface.pixels; cur != end; ++cur) {
-        *cur = color;
+//    const Color* end = &surface.pixels[surface.width * surface.height];
+//    for (Color* cur = surface.pixels; cur != end; ++cur) {
+//        *cur = color;
+//    }
+
+//    __m128i color_simd = _mm_set1_epi32(*(int*)&color);
+//    uint32_t block_count = surface.width * surface.height / 4;
+//    __m128i* end = (__m128i*)&surface.pixels[block_count * 4];
+//    for (__m128i* cur = (__m128i*)surface.pixels; cur != end; ++cur) {
+//        _mm_storeu_si128(cur, color_simd);
+//    }
+//    for (uint32_t i = block_count * 4; i < surface.width * surface.height; ++i) {
+//        surface.pixels[i] = color;
+//    }
+
+    __m256i color_simd = _mm256_set1_epi32(*(int*)&color);
+    uint32_t block_count = surface.width * surface.height / 8;
+    __m256i* end = (__m256i*)&surface.pixels[block_count * 8];
+    for (__m256i* cur = (__m256i*)surface.pixels; cur != end; ++cur) {
+        _mm256_storeu_si256(cur, color_simd);
+    }
+    for (uint32_t i = block_count * 8; i < surface.width * surface.height; ++i) {
+        surface.pixels[i] = color;
     }
 }
 
@@ -451,22 +471,30 @@ static Atom wm_delete_window;
 static int should_close = 0;
 
 Surface display_init(int width, int height, const char* title) {
-    (void) title;
     display_surface = surface_create(width, height);
     display = XOpenDisplay(NULL);
     if (display == NULL) {
         fprintf(stderr, "[ERROR] Failed to connect to X server!\n");
     }
     window = XCreateSimpleWindow(display, XDefaultRootWindow(display), 0, 0, width, height, 0, 0, 0);
+//    XSetWindowAttributes xwa = {.background_pixel = WhitePixel(display, XDefaultRootWindow(display)), .border_pixel = BlackPixel(display, XDefaultRootWindow(display))};
+    XStoreName(display, window, title);
+
     XGetWindowAttributes(display, window, &wa);
-    image = XCreateImage(display, wa.visual, wa.depth, ZPixmap, 0, (char*)display_surface.pixels, display_surface.width, display_surface.height, 32, (int)(display_surface.width * sizeof(uint32_t)));
+    image = XCreateImage(display, wa.visual, wa.depth, ZPixmap, 0, (char*)display_surface.pixels, display_surface.width, display_surface.height, 32, 0);
+    image->red_mask = 0x000000FF;
+    image->green_mask = 0x0000FF00;
+    image->blue_mask = 0x00FF0000;
+    image->byte_order = LSBFirst;
+    image->bitmap_unit = 32;
+    image->bitmap_bit_order = LSBFirst;
     gc = XCreateGC(display, window, 0, NULL);
     XSelectInput(display, window, KeyPressMask);  // | ExposureMask
     XMapWindow(display, window);
     wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(display, window, &wm_delete_window, 1);
     XSync(display, False);
-
+    
     return display_surface;
 }
 

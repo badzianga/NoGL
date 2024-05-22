@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 project(NoGL C)
 
 set(CMAKE_C_STANDARD 11)
+add_compile_options("-mavx2")
 
 add_library(NoGL STATIC src/NoGL.c
         src/NoUtils.c)
