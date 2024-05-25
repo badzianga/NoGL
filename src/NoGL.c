@@ -6,6 +6,31 @@
 #include <X11/Xlib.h>
 #include <immintrin.h>
 
+// Color module ----------------------------------------------------------------------------------------------------- //
+Color color_from_hex(uint32_t value) {
+    return *(Color*)&value;
+}
+
+uint32_t color_to_hex(Color color) {
+    return *(uint32_t*)&color;
+}
+
+Color color_grayscale(Color color) {
+    uint8_t value = (uint32_t)color.r * 2126 / 10000 + (uint32_t)color.g * 7152 / 10000 + (uint32_t)color.b * 722 / 10000;
+    color.r = value;
+    color.g = value;
+    color.b = value;
+    return color;
+}
+
+Color color_premul_alpha(Color color) {
+    color.r = color.r * color.a / 255;
+    color.g = color.g * color.a / 255;
+    color.b = color.b * color.a / 255;
+    return color;
+}
+
+
 // Surface module --------------------------------------------------------------------------------------------------- //
 Surface surface_create(uint32_t width, uint32_t height) {
     Surface surface = {

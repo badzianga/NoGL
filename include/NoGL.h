@@ -4,20 +4,25 @@
 
 // Color module ----------------------------------------------------------------------------------------------------- //
 typedef struct {
-    uint8_t r;
-    uint8_t g;
     uint8_t b;
+    uint8_t g;
+    uint8_t r;
     uint8_t a;
 } Color;
 
-#define RED     (Color){ 255, 0, 0, 255 }
+#define RED     (Color){ 0, 0, 255, 255 }
 #define GREEN   (Color){ 0, 255, 0, 255 }
-#define BLUE    (Color){ 0, 0, 255, 255 }
+#define BLUE    (Color){ 255, 0, 0, 255 }
 #define BLACK   (Color){ 0, 0, 0, 255 }
 #define WHITE   (Color){ 255, 255, 255, 255 }
-#define YELLOW  (Color){ 255, 255, 0, 255 }
+#define YELLOW  (Color){ 0, 255, 255, 255 }
 #define MAGENTA (Color){ 255, 0, 255, 255 }
-#define CYAN    (Color){ 0, 255, 255, 255 }
+#define CYAN    (Color){ 255, 255, 0, 255 }
+
+Color color_from_hex(uint32_t value);
+uint32_t color_to_hex(Color color);
+Color color_grayscale(Color color);
+Color color_premul_alpha(Color color);
 
 // Surface module --------------------------------------------------------------------------------------------------- //
 typedef struct {
